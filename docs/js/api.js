@@ -11,7 +11,7 @@ try {
   // ignore
 }
 
-const API_BASE_URL = 'http://localhost:3005/api';
+const API_BASE_URL = 'https://your-render-app.onrender.com/api';
 
 class API {
   static getToken() {
