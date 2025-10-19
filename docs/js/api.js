@@ -11,7 +11,7 @@ try {
   // ignore
 }
 
-const API_BASE_URL = 'https://mits-canteen-backend.onrender.com/api';
+const API_BASE_URL = 'https://mits-canteen-backend1.onrender.com/api';
 
 class API {
   static getToken() {
