@@ -1,0 +1,7 @@
+[dotenv@17.2.3] injecting env (3) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+🚀 Server running on port 3005
+🌐 Frontend: http://localhost:3005
+📡 API: http://localhost:3005/api
+🔄 Real-time updates enabled
+✅ MongoDB connected
+✅ Connected to MongoDB Atlas

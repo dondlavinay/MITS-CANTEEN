@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - MITS Canteen</title>
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f4f4f4 60%, #e0e7ef 100%);
+      overflow-x: hidden;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+    }
+
+    /* header section */
+    header {
+      background: #e3eafc;
+      color: #1e40af;
+      padding: 32px 0 28px 0;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(30, 64, 175, 0.13);
+      border-radius: 0 0 24px 24px;
+      position: relative;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 12px;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(17, 246, 154, 0.916);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .logo:hover {
+      transform: scale(1.08) rotate(-3deg);
+      box-shadow: 0 6px 24px rgba(117, 180, 184, 0.879);
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .brand-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1eaf6e;
+      letter-spacing: 1px;
+    }
+    .brand-subtitle {
+      font-size: 1rem;
+      color: #4a6572;
+      font-weight: 500;
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .brand-logo-canteen {
+      color: #ff9800;
+      font-weight: 900;
+    }
+    header::after {
+      content: "";
+      display: block;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, #ffd166 0%, #fcb900 100%);
+      border-radius: 2px;
+      margin: 28px auto 0 auto;
+      opacity: 0.7;
+    }
+
+    /* user email at top right */
+    .user-info {
+      position: absolute;
+      top: 16px;
+      right: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .user-email {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #35424a;
+      background: #ffd166;
+      padding: 6px 14px;
+      border-radius: 20px;
+      box-shadow: 0 2px 6px rgba(53, 66, 74, 0.15);
+      cursor: pointer;
+      position: relative;
+    }
+    .user-tooltip {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 200px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      margin-top: 8px;
+    }
+    .user-email:hover .user-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .user-tooltip h4 {
+      margin: 0 0 8px 0;
+      color: #1e40af;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 4px;
+    }
+    .user-tooltip p {
+      margin: 4px 0;
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .user-tooltip strong {
+      color: #333;
+    }
+    .my-orders-btn {
+      background: #1e40af;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(30, 64, 175, 0.2);
+    }
+    .my-orders-btn:hover {
+      background: #1d4ed8;
+    }
+    .logout-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+    }
+    .logout-btn:hover {
+      background: #b91c1c;
+    }
+
+
+
+    /* food section */
+    .food-types {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(53, 66, 74, 0.07);
+      width: 100%;
+      padding: 28px 32px;
+      text-align: center;
+      box-sizing: border-box;
+      margin-top: 28px;
+    }
+    .food-types h2 {
+      color: #35424a;
+      margin-bottom: 18px;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+    }
+    .food-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .food-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 32px;
+      width: 100%;
+    }
+    .food-list-grid li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f7fafc;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(53, 66, 74, 0.12);
+      padding: 32px 0 24px 0;
+      transition: transform 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+      text-align: center;
+    }
+    .food-list-grid li:hover {
+      transform: translateY(-8px) scale(1.07);
+      box-shadow: 0 8px 32px rgba(53, 66, 74, 0.18);
+      background: #fffbe6;
+    }
+    .food-icon {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(53, 66, 74, 0.08);
+      background: #fff;
+    }
+    .food-list-grid span {
+      font-size: 1.1rem;
+      color: #35424a;
+      font-weight: 600;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+      text-shadow: 0 1px 2px #e0e7ef;
+      text-align: center;
+      display: block;
+      line-height: 1.2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 22px 0;
+      background: linear-gradient(90deg, #35424a 60%, #4a6572 100%);
+      color: #ffffff;
+      width: 100%;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      box-shadow: 0 -2px 8px rgba(53, 66, 74, 0.05);
+    }
+    
+    @keyframes moveLeftRight {
+      0% { transform: translateX(-700px) scaleX(1); }
+      25% { transform: translateX(700px) scaleX(1); }
+      50% { transform: translateX(700px) scaleX(-1); }
+      75% { transform: translateX(-700px) scaleX(-1); }
+      100% { transform: translateX(-700px) scaleX(1); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- user info -->
+    <div class="user-info">
+      <div class="user-email" id="user-email-display">
+        user@example.com
+        <div class="user-tooltip" id="user-tooltip">
+          <h4>User Information</h4>
+          <p><strong>Name:</strong> <span id="tooltip-name">-</span></p>
+          <p><strong>Email:</strong> <span id="tooltip-email">-</span></p>
+          <p><strong>Phone:</strong> <span id="tooltip-phone">-</span></p>
+          <p><strong>Role:</strong> <span id="tooltip-role">-</span></p>
+          <p><strong>ID:</strong> <span id="tooltip-id">-</span></p>
+        </div>
+      </div>
+      <button class="my-orders-btn" onclick="window.location.href='my-orders.html'">My Orders</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="brand-logo">
+      <img src="mitslogo.png" alt="MITS Logo" class="logo">
+      <div class="brand-text">
+        <span class="brand-title">
+          MITS <span class="brand-logo-canteen">Canteen</span>
+        </span>
+        <span class="brand-subtitle">Fresh • Tasty • Affordable</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- GIF Section -->
+  <div style="text-align: center; padding: 15px 0; background: linear-gradient(135deg, #ebebeb 0%, #e3f2fd 100%); border-bottom: 1px solid rgba(30, 64, 175, 0.1);">
+    <div style="font-size: 2rem; animation: moveLeftRight 40s infinite;"><img src="images/gif/hel.webp" alt="Menu" class="stats-image" style="width: 150px; height: auto;"></div>
+  </div>
+
+  <main>
+
+
+    <!-- Food Items -->
+    <section class="food-types">
+      <h2>Types of Food Items</h2>
+      <ul class="food-list food-list-grid" id="food-categories">
+        <li><a href="snacks.html"><img src="images/index/snacks.png" class="food-icon"><span>Snacks</span></a></li>
+        <li><a href="veg.html"><img src="images/index/veg.jpg" class="food-icon"><span>Veg</span></a></li>
+        <li><a href="icecream.html"><img src="images/index/ice.webp" class="food-icon"><span>Ice Creams</span></a></li>
+        <li><a href="juice.html"><img src="images/index/juice.jpg" class="food-icon"><span>Juice</span></a></li>
+        <li><a href="nonveg.html"><img src="images/index/nonveg.jpg" class="food-icon"><span>Non Veg</span></a></li>
+        <li><a href="starters.html"><img src="images/index/starters.jpeg" class="food-icon"><span>Starters</span></a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 MITS Canteen. All rights reserved.</p>
+  </footer>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/api.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/realtime.js"></script>
+  <script>
+
+    
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // Clear all authentication data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('cart');
+        localStorage.removeItem('cartPrices');
+        API.removeToken();
+        
+        // Redirect to index with logout message
+        sessionStorage.setItem('logoutMessage', 'You have been logged out successfully!');
+        window.location.href = 'index.html';
+      }
+    }
+    
+    async function loadCategoryItemCounts() {
+      try {
+        const categories = [
+          { name: 'snacks', selector: 'Snacks' },
+          { name: 'veg', selector: 'Veg' },
+          { name: 'icecream', selector: 'Ice Creams' },
+          { name: 'juice', selector: 'Juice' },
+          { name: 'nonveg', selector: 'Non Veg' },
+          { name: 'starters', selector: 'Starters' }
+        ];
+        
+        const foodList = document.getElementById('food-categories');
+        const listItems = foodList.querySelectorAll('li');
+        
+        for (let i = 0; i < categories.length; i++) {
+          try {
+            const items = await API.getMenuItems(categories[i].name);
+            const span = listItems[i].querySelector('span');
+            if (span) {
+              span.textContent = `${categories[i].selector} (${items.length})`;
+            }
+          } catch (error) {
+            const span = listItems[i].querySelector('span');
+            if (span) {
+              span.textContent = `${categories[i].selector} (0)`;
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Could not load category counts');
+      }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!token || !user.email) {
+        window.location.href = 'user-login.html';
+        return;
+      }
+      
+      // Set email display with icon
+      const emailDisplay = document.getElementById('user-email-display');
+      const emailText = emailDisplay.childNodes[0];
+      emailText.textContent = '👤';
+      
+      // Populate tooltip
+      document.getElementById('tooltip-name').textContent = user.name || 'N/A';
+      document.getElementById('tooltip-email').textContent = user.email || 'N/A';
+      document.getElementById('tooltip-phone').textContent = user.phone || 'N/A';
+      document.getElementById('tooltip-role').textContent = user.role || 'N/A';
+      
+      // Show appropriate ID based on role
+      const idValue = user.role === 'Student' ? user.studentId : user.staffId;
+      document.getElementById('tooltip-id').textContent = idValue || 'N/A';
+      
+      // Load category item counts
+      loadCategoryItemCounts();
+    });
+
+  </script>
+</body>
+</html>

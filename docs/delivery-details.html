@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Details - MITS Canteen</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body {
+            background: linear-gradient(120deg, #f7f7f7 0%, #f7f7f7 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .delivery-details-container {
+            max-width: 420px;
+            margin: 48px auto;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(30, 64, 175, 0.10);
+            padding: 32px 24px 24px 24px;
+        }
+        .delivery-details-form label {
+            display: block;
+            margin-top: 16px;
+            font-weight: 600;
+            color: #3d58b1;
+        }
+        .delivery-details-form input,
+        .delivery-details-form select {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .delivery-details-form button {
+            margin-top: 22px;
+            width: 100%;
+            background: linear-gradient(90deg, #f0eee6f9 60%, #fdfcf9fe 100%);
+            color: #493abb;
+            border: none;
+            border-radius: 8px;
+            height: 38px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #e0e7ef;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .delivery-details-form button:hover {
+            background: linear-gradient(90deg, #fffffffe 60%, #fffffff9 100%);
+            transform: translateY(-2px) scale(1.01);
+        }
+        #cart-summary {
+            margin-top: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px 10px;
+            color: #1e40af;
+            font-size: 1rem;
+        }
+        #cart-items-list {
+            margin: 10px 0 0 0;
+            padding-left: 18px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Run early: if not authenticated redirect to login page immediately
+        (function enforceLoginOnDeliveryPage() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    // Use replace so the delivery page is not kept in history
+                    window.location.replace('user-login.html');
+                }
+            } catch (e) {
+                window.location.replace('user-login.html');
+            }
+        })();
+    </script>
+    <div class="brand-logo-centered">
+        <span class="brand-logo-title">
+            <img src="mitslogo.png" alt="MITS Logo" class="brand-logo-img">
+            MITS <span class="brand-logo-canteen">Canteen</span>
+        </span>
+        <div class="brand-logo-subtitle">
+            Fresh • Tasty • Affordable
+        </div>
+    </div>
+    
+    <div class="delivery-details-container">
+        <h2 id="form-title">Login Required</h2>
+        
+        <!-- Login Form -->
+        <form class="delivery-details-form" id="login-form" style="display:none;">
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" name="login-email" required>
+            
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" name="login-password" required>
+            
+            <button type="submit">Login</button>
+            
+            <p style="text-align:center; margin-top:15px;">
+                Don't have an account? <a href="user-signup.html" style="color:#1e40af;">Sign up here</a>
+            </p>
+        </form>
+        
+        <!-- Delivery Details Form -->
+        <form class="delivery-details-form" id="delivery-details-form" style="display:none;">
+            <label for="delivery-name">Name:</label>
+            <input type="text" id="delivery-name" name="delivery-name" required>
+            
+            <label for="delivery-address">Room Number (for delivery):</label>
+            <input type="text" id="delivery-address" name="delivery-address" required>
+            
+            <label for="delivery-time">Preferred Delivery Time:</label>
+            <input type="time" id="delivery-time" name="delivery-time" required>
+            
+            <label for="payment-method">Payment Method:</label>
+            <select id="payment-method" name="payment-method" required>
+                <option value="">Select</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+                <option value="UPI">UPI</option>
+            </select>
+            
+            <div id="payment-details-group" style="display:none;">
+                <label for="payment-details">UTR ID:</label>
+                <input type="text" id="payment-details" name="payment-details" placeholder="Enter 12-digit UTR ID" maxlength="12" pattern="[A-Za-z0-9]{12}" title="UTR ID must be exactly 12 alphanumeric characters">
+                <div id="utr-status" style="font-size: 0.9rem; margin-top: 5px;"></div>
+            </div>
+            
+            <div id="cart-summary">
+                <strong>Order Summary:</strong>
+                <ul id="cart-items-list"></ul>
+                <div style="margin-top:10px;">
+                    <strong>Items Cost: ₹<span id="cart-total">0</span></strong><br>
+                    <span>Delivery Charge: ₹<span id="delivery-charge">20</span></span>
+                </div>
+                <div id="total-cost-formula" style="margin-top:8px; font-weight:600; text-align:right;"></div>
+            </div>
+            
+            <div id="qr-section" style="display:none; margin-top:18px; text-align:center;">
+                <div style="margin-bottom:8px; font-weight:600;">Scan to Pay (UPI):</div>
+                <img id="qr-code-img" src="" alt="UPI QR Code" style="background:#fff; padding:8px; border-radius:10px; box-shadow:0 2px 8px #e0e7ef;">
+                <div style="font-size:0.95em; color:#64748b; margin-top:6px;">UPI ID: 6303549365@fam</div>
+                <div id="qr-amount-display" style="font-size:0.9em; color:#3d58b1; margin-top:4px; font-weight:600;"></div>
+            </div>
+            
+            <button type="submit">Submit Order</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        // Cart summary with backend price calculation
+        async function renderCartSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+            const cartList = document.getElementById('cart-items-list');
+            
+            cartList.innerHTML = '';
+            
+            if (Object.keys(cart).length === 0) {
+                document.getElementById('cart-summary').style.display = 'none';
+                return;
+            }
+            
+            try {
+                const items = Object.entries(cart).map(([name, quantity]) => ({
+                    name,
+                    quantity: parseInt(quantity)
+                }));
+                
+                const calculation = await API.calculateTotal(items);
+                
+                calculation.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} (₹${item.price} each) x ${item.quantity} = ₹${item.total}`;
+                    cartList.appendChild(li);
+                });
+                
+                document.getElementById('cart-total').textContent = calculation.subtotal;
+                document.getElementById('delivery-charge').textContent = calculation.deliveryCharge;
+                
+                const totalCostDiv = document.getElementById('total-cost-formula');
+                totalCostDiv.innerHTML = `Total Cost: ₹${calculation.total}`;
+                
+                updateQRCode(calculation.total);
+                
+            } catch (error) {
+                console.error('Failed to calculate total:', error);
+                cartList.innerHTML = '<li style="color:#b91c1c;">Failed to calculate prices</li>';
+            }
+            
+            document.getElementById('cart-summary').style.display = 'block';
+        }
+        
+        function updateQRCode(amount) {
+            const qrSection = document.getElementById('qr-section');
+            const paymentMethod = document.getElementById('payment-method').value;
+            
+            if (paymentMethod === 'UPI') {
+                const upiId = '6303549365@fam';
+                const name = 'MITS Canteen';
+                const timestamp = Date.now();
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&cache=${timestamp}&data=upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+                document.getElementById('qr-code-img').src = qrUrl;
+                document.getElementById('qr-amount-display').textContent = `Amount: ₹${amount}`;
+                qrSection.style.display = 'block';
+            } else {
+                qrSection.style.display = 'none';
+            }
+        }
+
+        // UTR ID validation
+        document.getElementById('payment-details').addEventListener('input', async function() {
+            const utrId = this.value.trim();
+            const statusDiv = document.getElementById('utr-status');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            if (utrId.length === 12 && /^[A-Za-z0-9]{12}$/.test(utrId)) {
+                try {
+                    const response = await fetch('/api/orders/check-utr', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ utrId })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.exists) {
+                        statusDiv.innerHTML = '<span style="color: red;">⚠️ UTR ID already used - Don\'t do fraud!</span>';
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = '0.5';
+                    } else {
+                        statusDiv.innerHTML = '<span style="color: green;">✓ UTR ID available</span>';
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = '<span style="color: orange;">Unable to verify UTR ID</span>';
+                }
+            } else {
+                statusDiv.innerHTML = '';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            }
+        });
+
+        // Payment method change handler
+        document.getElementById('payment-method').addEventListener('change', function() {
+            const paymentMethod = this.value;
+            const paymentDetailsGroup = document.getElementById('payment-details-group');
+            
+            if (paymentMethod === 'Cash on Delivery') {
+                paymentDetailsGroup.style.display = 'none';
+                document.getElementById('qr-section').style.display = 'none';
+            } else {
+                paymentDetailsGroup.style.display = 'block';
+                if (paymentMethod === 'UPI') {
+                    const subtotal = parseInt(document.getElementById('cart-total').textContent) || 0;
+                    const deliveryCharge = parseInt(document.getElementById('delivery-charge').textContent) || 20;
+                    updateQRCode(subtotal + deliveryCharge);
+                }
+            }
+        });
+        
+
+
+        // Order submission
+        document.getElementById('delivery-details-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Please login first to place an order');
+                    window.location.href = 'user-login.html';
+                    return;
+                }
+                // Optionally, check if user info exists and is valid
+                const user = localStorage.getItem('user');
+                if (!user) {
+                    alert('Please login first to place an order');
+                    window.location.href = 'user-login.html';
+                    return;
+                }
+                // Optionally, verify token by calling /auth/me
+                try {
+                    await API.getCurrentUser();
+                } catch (err) {
+                    alert('Session expired or invalid. Please login again.');
+                    window.location.href = 'user-login.html';
+                    return;
+                }
+                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                if (Object.keys(cart).length === 0) {
+                    alert('Your cart is empty!');
+                    return;
+                }
+                
+                // Validate UTR ID for UPI payments
+                const paymentMethod = document.getElementById('payment-method').value;
+                const utrId = document.getElementById('payment-details').value;
+                if (paymentMethod === 'UPI') {
+                    if (!utrId || utrId.length !== 12 || !/^[A-Za-z0-9]{12}$/.test(utrId)) {
+                        alert('UTR ID must be exactly 12 alphanumeric characters');
+                        return;
+                    }
+                    
+                    // Final check if UTR ID exists
+                    try {
+                        const checkResponse = await fetch('/api/orders/check-utr', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify({ utrId })
+                        });
+                        const checkData = await checkResponse.json();
+                        
+                        if (checkData.exists) {
+                            alert('⚠️ Fraud Alert: This UTR ID is already used. Don\'t do fraud!');
+                            return;
+                        }
+                    } catch (error) {
+                        alert('Unable to verify UTR ID. Please try again.');
+                        return;
+                    }
+                }
+                const orderItems = [];
+                const menuItems = await API.getMenuItems();
+                for (const [itemName, quantity] of Object.entries(cart)) {
+                    const menuItem = menuItems.find(item => item.name === itemName);
+                    if (menuItem) {
+                        orderItems.push({
+                            menuItem: menuItem._id,
+                            quantity: parseInt(quantity),
+                            price: menuItem.price
+                        });
+                    }
+                }
+                if (orderItems.length === 0) {
+                    alert('No valid items found in cart!');
+                    return;
+                }
+                const orderData = {
+                    items: orderItems,
+                    deliveryAddress: document.getElementById('delivery-address').value,
+                    deliveryTime: document.getElementById('delivery-time').value,
+                    paymentMethod: document.getElementById('payment-method').value,
+                    paymentDetails: document.getElementById('payment-details').value // UTR ID
+                };
+                const order = await API.createOrder(orderData);
+                const orderDetails = {
+                    orderId: order._id,
+                    name: document.getElementById('delivery-name').value,
+                    address: document.getElementById('delivery-address').value,
+                    time: document.getElementById('delivery-time').value,
+                    paymentMethod: document.getElementById('payment-method').value,
+                    paymentDetails: document.getElementById('payment-details').value,
+                    cart: cart,
+                    order: order
+                };
+                sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+                localStorage.removeItem('cart');
+                window.location.href = 'order-bill.html';
+            } catch (error) {
+                console.error('Order creation failed:', error);
+                if (error.message.includes('UTR ID already used')) {
+                    alert('⚠️ Fraud Alert: This UTR ID is already used. Don\'t do fraud!');
+                } else {
+                    alert('Failed to create order: ' + error.message);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Order';
+            }
+        });
+
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+            
+            try {
+                const loginData = {
+                    email: document.getElementById('login-email').value,
+                    password: document.getElementById('login-password').value
+                };
+                
+                const response = await API.login(loginData);
+                
+                // Store user data and token
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', JSON.stringify(response.user));
+                API.setToken(response.token);
+                
+                // Connect to real-time updates after login
+                if (window.realTimeUpdates) {
+                    window.realTimeUpdates.connectAfterLogin();
+                }
+                
+                // Show delivery form
+                showDeliveryForm();
+                
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        });
+        
+        // Show appropriate form based on login status
+        function showDeliveryForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('delivery-details-form').style.display = 'block';
+            document.getElementById('form-title').textContent = 'Delivery Details';
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('delivery-name').value = user.name || '';
+            renderCartSummary();
+        }
+        
+        function showLoginForm() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('delivery-details-form').style.display = 'none';
+            document.getElementById('form-title').textContent = 'Login Required';
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                showLoginForm();
+            } else {
+                showDeliveryForm();
+            }
+        });
+    </script>
+</body>
+</html>

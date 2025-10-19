@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Bill - MITS Canteen</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body {
+            background: #f7f7f7;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+        }
+        .bill-container {
+            max-width: 480px;
+            margin: 48px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(30, 64, 175, 0.10);
+            padding: 32px 24px 24px 24px;
+        }
+        .bill-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .bill-header img {
+            height: 36px;
+            vertical-align: middle;
+        }
+        .bill-title {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #1e40af;
+            margin-left: 8px;
+        }
+        .bill-section-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-top: 18px;
+            margin-bottom: 6px;
+        }
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+        .bill-table th, .bill-table td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 6px;
+            text-align: left;
+        }
+        .bill-table th {
+            background: #f1f5f9;
+            color: #1e40af;
+        }
+        .bill-summary {
+            margin-top: 18px;
+            font-size: 1.08rem;
+        }
+        .bill-summary strong {
+            color: #1e40af;
+        }
+        .bill-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: #64748b;
+            font-size: 0.98rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bill-container">
+        <div class="bill-header">
+            <img src="mitslogo.png" alt="MITS Logo">
+            <span class="bill-title">MITS Canteen</span>
+            <div style="font-size:1.05rem;color:#64748b;">Order Bill</div>
+        </div>
+        <div id="bill-details">
+            <!-- Bill details will be rendered here -->
+        </div>
+        <div class="bill-footer">
+            Thank you for ordering!<br>
+            For queries, contact canteen staff.<br>
+            Phone: <a href="tel:6303549365" style="color:#1e40af;text-decoration:none;">6303549365</a><br>
+            <br>
+            <button onclick="window.location.href='user-dashboard.html'" style="background:#1e40af;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Back to Dashboard</button>
+            
+    </div>
+    <script>
+        function renderBill() {
+            const billDiv = document.getElementById('bill-details');
+            let orderDetails = {};
+            
+            try {
+                orderDetails = JSON.parse(sessionStorage.getItem('orderDetails') || '{}');
+            } catch (e) { 
+                orderDetails = {}; 
+            }
+            
+            if (!orderDetails || (!orderDetails.cart && !orderDetails.order)) {
+                billDiv.innerHTML = '<div style="color:#b91c1c;">No order found.</div>';
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const order = orderDetails.order || {};
+            
+            // Check if user is logged in
+            if (!localStorage.getItem('token') || !user.email) {
+                billDiv.innerHTML = '<div style="color:#b91c1c;">Please login to view order details.</div>';
+                return;
+            }
+            
+            // Order ID and status
+            const orderIdHtml = orderDetails.orderId ? `
+                <div class="bill-section-title">Order Information</div>
+                <div>Order ID: <strong>#${orderDetails.orderId.slice(-6)}</strong></div>
+                <div>Status: <strong>${order.status || 'Pending'}</strong></div>
+                <div>Order Date: <strong>${new Date(order.orderDate || Date.now()).toLocaleString()}</strong></div>
+            ` : '';
+            
+            // User details
+            const userHtml = `
+                <div class="bill-section-title">Customer Details</div>
+                <div>Name: <strong>${orderDetails.name || user.name || ''}</strong></div>
+                <div>Room Number: <strong>${orderDetails.address || ''}</strong></div>
+                <div>Preferred Delivery Time: <strong>${orderDetails.time || ''}</strong></div>
+                <div>Email: <strong>${user.email || ''}</strong></div>
+                <div>Phone: <strong>${user.phone || ''}</strong></div>
+            `;
+            
+            // Order items
+            let itemsHtml = `
+                <div class="bill-section-title">Order Items</div>
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Rate</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            let subtotal = 0;
+            
+            // Use order items from backend if available, otherwise use cart
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(item => {
+                    const cost = item.price * item.quantity;
+                    subtotal += cost;
+                    itemsHtml += `
+                        <tr>
+                            <td>${item.menuItem.name || 'Unknown Item'}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${item.price}</td>
+                            <td>₹${cost}</td>
+                        </tr>
+                    `;
+                });
+            } else if (orderDetails.cart) {
+                // Fallback to cart data
+                const prices = orderDetails.prices || {};
+                Object.keys(orderDetails.cart).forEach(item => {
+                    const qty = orderDetails.cart[item];
+                    let price = prices[item] || 0;
+                    const cost = price * qty;
+                    subtotal += cost;
+                    itemsHtml += `
+                        <tr>
+                            <td>${item}</td>
+                            <td>${qty}</td>
+                            <td>₹${price}</td>
+                            <td>₹${cost}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            itemsHtml += `
+                    </tbody>
+                </table>
+            `;
+            
+            // Payment and cost summary
+            const deliveryCharge = 20;
+            const orderSubtotal = subtotal;
+            const total = orderSubtotal + deliveryCharge;
+            
+            const summaryHtml = `
+                <div class="bill-section-title">Payment & Summary</div>
+                <div>Payment Method: <strong>${orderDetails.paymentMethod || 'Not specified'}</strong></div>
+                <div class="bill-summary">
+                    <div>Items Subtotal: ₹${orderSubtotal}</div>
+                    <div>Delivery Charge: ₹${deliveryCharge}</div>
+                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #e5e7eb;">
+                    <strong>Total Amount: ₹${total}</strong>
+                </div>
+            `;
+            
+            billDiv.innerHTML = orderIdHtml + userHtml + itemsHtml + summaryHtml;
+        }
+        
+        renderBill();
+    </script>
+</body>
+</html>

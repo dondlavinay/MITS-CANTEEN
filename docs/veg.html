@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veg Items - MITS Canteen</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .snack-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .watchlist-bar {
+            position: absolute;
+            top: 24px;
+            right: 40px;
+            background: #fff8e1;
+            color: #1e40af;
+            padding: 10px 22px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px #fcb90033;
+            font-size: 1.1rem;
+            z-index: 100;
+        }
+        .remove-btn {
+            background: #ffebee;
+            color: #d32f2f;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-left: 8px;
+            vertical-align: middle;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .remove-btn:hover {
+            background: #ffcdd2;
+            color: #b71c1c;
+        }
+        .watchlist-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 10px;
+            margin-bottom: 4px;
+            background: #f5f7fa;
+            border-radius: 12px;
+            padding: 3px 10px 3px 10px;
+            box-shadow: 0 1px 4px #e0e0e0;
+        }
+        .snacks-container {
+            margin: 48px auto 0 auto;
+            max-width: 1100px;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 6px 32px rgba(30, 64, 175, 0.10);
+            padding: 36px 24px 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .menu-heading {
+            color: #1e40af;
+            margin-bottom: 32px;
+            font-size: 2.4rem;
+            letter-spacing: 1px;
+            text-align: center;
+            font-weight: 700;
+            width: 100%;
+        }
+        .cart-bar {
+            display: flex;
+            flex-direction: column;
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-top: 24px;
+            width: 100%;
+        }
+        .cart-bar strong {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #1e40af;
+        }
+        .cart-bar #cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .cart-bar .button {
+            margin-top: 14px;
+            display: none;
+            width: 100%;
+        }
+        .watchlist-bar-bottom {
+            position: absolute;
+            top: 24px;
+            right: 40px;
+            background: #fff8e1;
+            color: #1e40af;
+            padding: 10px 22px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px #fcb90033;
+            font-size: 1.1rem;
+            z-index: 100;
+        }
+        .food-name {
+            font-size: 1.3rem;
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .food-price {
+            font-size: 1.2rem;
+            color: #059669;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .food-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: flex-start;
+            padding: 20px 0;
+            list-style: none;
+            margin: 0;
+        }
+        .food-list li {
+            flex: 0 0 160px;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+        }
+        .food-list li:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            background: linear-gradient(135deg, #fffbe6 0%, #fff3cd 100%);
+            border-color: #ffd166;
+        }
+        .food-icon {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .snack-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .snack-actions input {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+            margin: 0 auto 6px;
+        }
+        .snack-actions .button {
+            background: #ffd166;
+            color: #35424a;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .snack-actions .button:hover {
+            background: #fcb900;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand-logo-centered">
+        <span class="brand-logo-title">
+            <img src="mitslogo.png" alt="MITS Logo" class="brand-logo-img">
+            MITS <span class="brand-logo-canteen">Canteen</span>
+        </span>
+        <div class="brand-logo-subtitle">
+            Fresh • Tasty • Affordable
+        </div>
+    </div>
+    <div class="snacks-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="history.back()" class="button" style="background: #e3f2fd; color: #1e40af;">← Back</button>
+            <h2 class="menu-heading" style="margin: 0;">Veg Menu</h2>
+            <button onclick="window.location.href='user-dashboard.html'" class="button" style="background: #fff3cd; color: #35424a;">🏠 Home</button>
+        </div>
+        <ol class="food-list food-list-grid">
+        </ol>
+    </div>
+    <div class="watchlist-bar watchlist-bar-bottom">
+        <strong>Cart:</strong>
+        <div id="cart-items" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">None</div>
+        <button id="order-all-btn" class="button" style="margin-top:14px; display:none; width:100%; background:#22c55e; color:#fff;" onclick="orderAll()">Order Now</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/fallback-menu.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="js/realtime.js"></script>
+    <script src="/js/cart.js?v=2"></script>
+    <script>
+    // Load menu items from backend with fallback
+    async function loadMenuItems() {
+      try {
+        const menuItems = await APIWithFallback.getMenuItems('veg');
+        const foodList = document.querySelector('.food-list');
+        
+        if (menuItems.length === 0) {
+          foodList.innerHTML = '<li style="text-align:center; padding:20px; color:#666;">No items available</li>';
+          return;
+        }
+        
+        foodList.innerHTML = menuItems.map(item => `
+          <li data-item="${item.name.toLowerCase().replace(/\s+/g, '-')}" data-item-id="${item._id}">
+            <img src="${item.image || 'images/default-food.jpg'}" alt="${item.name}" class="food-icon" onerror="this.src='images/default-food.jpg'">
+            <div class="food-name">${item.name}</div>
+            <div class="food-price">₹${item.price}</div>
+            <div class="snack-actions">
+              <input type="number" id="qty-${item._id}" min="1" value="1" style="width:60px;">
+              <button class="button" onclick="addToCart('${item.name}', 'qty-${item._id}');return false;">add to cart</button>
+              <button class="button" onclick="orderNow('${item.name}');return false;">Order Now</button>
+            </div>
+          </li>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load menu items:', error);
+      }
+    }
+    
+    // Load items when page loads
+    document.addEventListener('DOMContentLoaded', loadMenuItems);
+
+    </script>
+</body>
+</html>

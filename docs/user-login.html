@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login - MITS Canteen</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body { margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+        
+        .split-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .animation-half {
+            flex: 1;
+            background: linear-gradient(135deg, #e3eafc 0%, #ffd166 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-half {
+            flex: 1;
+            background: linear-gradient(135deg, #f4f4f4 60%, #e0e7ef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .food-animation {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .floating-food {
+            position: absolute;
+            font-size: 3rem;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .food-1 { top: 10%; left: 20%; animation-delay: 0s; }
+        .food-2 { top: 30%; right: 15%; animation-delay: 1s; }
+        .food-3 { top: 60%; left: 10%; animation-delay: 2s; }
+        .food-4 { top: 80%; right: 25%; animation-delay: 3s; }
+        .food-5 { top: 20%; left: 60%; animation-delay: 4s; }
+        .food-6 { top: 70%; right: 50%; animation-delay: 5s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .brand-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .animated-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(17, 246, 154, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .animated-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1eaf6e;
+            margin: 20px 0 10px 0;
+            animation: slideIn 1s ease-out;
+        }
+        
+        .canteen-text {
+            color: #ff9800;
+            font-weight: 900;
+        }
+        
+        .animated-subtitle {
+            font-size: 1.2rem;
+            color: #4a6572;
+            font-weight: 500;
+            animation: slideIn 1s ease-out 0.5s both;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .customer-details-container {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            animation: slideIn 1s ease-out 1s both;
+        }
+        
+        @media (max-width: 768px) {
+            .split-container { flex-direction: column; }
+            .animation-half { flex: 0.4; }
+            .form-half { flex: 0.6; }
+            .floating-food { font-size: 2rem; }
+            .animated-title { font-size: 2rem; }
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(30, 64, 175, 0.3);
+            z-index: 1000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            min-width: 250px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-container">
+        <!-- Left Half - Animated Food Visuals -->
+        <div class="animation-half">
+            <div class="food-animation">
+                <div class="floating-food food-1">🍕</div>
+                <div class="floating-food food-2">🍔</div>
+                <div class="floating-food food-3">🍟</div>
+                <div class="floating-food food-4">🥤</div>
+                <div class="floating-food food-5">🍦</div>
+                <div class="floating-food food-6">🌮</div>
+                <div class="brand-overlay">
+                    <img src="mitslogo.png" alt="MITS Logo" class="animated-logo">
+                    <h1 class="animated-title">MITS <span class="canteen-text">Canteen</span></h1>
+                    <p class="animated-subtitle">Fresh • Tasty • Affordable</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Half - Login Form -->
+        <div class="form-half">
+            <div class="customer-details-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div></div>
+            <h2 style="margin: 0;">User Login</h2>
+            <button onclick="window.location.href='index.html'" class="button" style="background: #fff3cd; color: #35424a; padding: 6px 12px; font-size: 0.8rem;">🏠 Home</button>
+        </div>
+        <form class="customer-details-form">
+            <label for="customer-email">Email:</label>
+            <input type="email" id="customer-email" name="customer-email" required>
+            
+            <div style="margin: 10px 0;">
+                <input type="radio" id="student" name="role" value="Student" required>
+                <label for="student" style="display:inline;">Student</label>
+                <input type="radio" id="staff" name="role" value="Staff" style="margin-left:20px;" required>
+                <label for="staff" style="display:inline;">Staff</label>
+            </div>
+
+            <div id="student-id-field" style="display:none;">
+                <label for="student-id">Student ID:</label>
+                <input type="text" id="student-id" name="student-id">
+            </div>
+
+            <div id="staff-id-field" style="display:none;">
+                <label for="staff-id">Staff ID:</label>
+                <input type="text" id="staff-id" name="staff-id">
+            </div>
+
+            <label for="password">Password:</label>
+            <div style="position: relative; display: inline-block; width: 100%;">
+                <input type="password" id="password" name="password" required style="width: 100%; padding-right: 30px; box-sizing: border-box;">
+                <span onclick="togglePassword('password')" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: #666; user-select: none;">👁️</span>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <input type="checkbox" id="send-otp" style="margin-right: 8px;">
+                <label for="send-otp" style="display: inline; font-size: 0.9rem;">Send OTP to email for verification</label>
+                <div id="otp-message" style="display:none; color:#1e40af; margin-top:8px; font-size:1rem;">
+                    OTP sent to your email address.
+                </div>
+            </div>
+
+            <div id="otp-section" style="display: none; margin: 15px 0;">
+                <label for="otp-input">Enter OTP:</label>
+                <input type="text" id="otp-input" name="otp-input" maxlength="6" placeholder="6-digit OTP">
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="button">Log in</button>
+        </form>
+
+        <!-- Signup Option -->
+        <div style="margin-top: 16px; text-align: center; font-size: 0.95rem; color:#1e40af;">
+            Don’t have an account?
+            <a href="user-signup.html" style="color:#2563eb; text-decoration:none; font-weight:500; margin-left:6px;">
+                Signup here
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Info Bar (after login) -->
+    <div id="user-info-bar" style="position:fixed;top:18px;right:32px;z-index:200;display:none;background:#fff8e1;padding:10px 22px;border-radius:16px;box-shadow:0 2px 8px #fcb90033;font-size:1rem;color:#1e40af;">
+        <span id="user-info-name"></span>
+        <span id="user-info-email" style="margin-left:12px;"></span>
+        <span id="user-info-phone" style="margin-left:12px;"></span>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Role selection logic
+        const studentRadio = document.getElementById('student');
+        const staffRadio = document.getElementById('staff');
+        const studentIdField = document.getElementById('student-id-field');
+        const staffIdField = document.getElementById('staff-id-field');
+
+        studentRadio.addEventListener('change', function() {
+            if (studentRadio.checked) {
+                studentIdField.style.display = 'block';
+                staffIdField.style.display = 'none';
+                document.getElementById('student-id').required = true;
+                document.getElementById('staff-id').required = false;
+            }
+        });
+
+        staffRadio.addEventListener('change', function() {
+            if (staffRadio.checked) {
+                staffIdField.style.display = 'block';
+                studentIdField.style.display = 'none';
+                document.getElementById('staff-id').required = true;
+                document.getElementById('student-id').required = false;
+            }
+        });
+
+        // OTP functionality
+        const otpCheckbox = document.getElementById('send-otp');
+        const otpSection = document.getElementById('otp-section');
+        let generatedOtp = '';
+
+        otpCheckbox.addEventListener('change', async function() {
+            const otpMessage = document.getElementById('otp-message');
+            
+            if (otpCheckbox.checked) {
+                const email = document.getElementById('customer-email').value;
+                
+                if (!email) {
+                    alert('Please enter email first');
+                    otpCheckbox.checked = false;
+                    return;
+                }
+                
+                try {
+                    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                    
+                    const response = await fetch('/api/send-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, otp: generatedOtp })
+                    });
+                    
+                    if (response.ok) {
+                        otpSection.style.display = 'block';
+                        otpMessage.style.display = 'block';
+                        showNotification(`📧 OTP sent to ${email}`);
+                    } else {
+                        throw new Error('Failed to send OTP');
+                    }
+                } catch (error) {
+                    otpSection.style.display = 'block';
+                    otpMessage.style.display = 'block';
+                    showNotification(`📧 OTP sent to ${email}: ${generatedOtp}`);
+                }
+            } else {
+                otpSection.style.display = 'none';
+                otpMessage.style.display = 'none';
+                generatedOtp = '';
+            }
+        });
+        
+        // Notification function
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `<span>🍽️ ${message}</span>`;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Toggle Password Visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling;
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        window.togglePassword = togglePassword;
+
+        // Form Submit
+        document.querySelector('.customer-details-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('customer-email').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const studentId = document.getElementById('student-id').value;
+            const staffId = document.getElementById('staff-id').value;
+            const password = document.getElementById('password').value;
+            
+            // Check OTP if enabled
+            if (otpCheckbox.checked) {
+                const enteredOtp = document.getElementById('otp-input').value;
+                if (enteredOtp !== generatedOtp) {
+                    alert('Invalid OTP!');
+                    return;
+                }
+            }
+            
+            try {
+                const loginData = {
+                    email,
+                    password,
+                    role,
+                    ...(role === 'Student' && { studentId }),
+                    ...(role === 'Staff' && { staffId })
+                };
+                
+                const response = await API.login(loginData);
+                API.setToken(response.token);
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('user', JSON.stringify(response.user));
+                
+                // Connect to real-time updates after login
+                if (window.realTimeUpdates) {
+                    window.realTimeUpdates.connectAfterLogin();
+                }
+                
+                alert('Login successful!');
+                
+                // Check if user has items in cart and redirect to delivery details
+                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                if (Object.keys(cart).length > 0) {
+                    window.location.href = 'delivery-details.html';
+                } else {
+                    window.location.href = 'user-dashboard.html';
+                }
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

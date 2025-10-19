@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITS Canteen</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f4f4f4 60%, #e0e7ef 100%);
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    
+
+
+    main {
+      flex: 1;
+    }
+
+    /* header section */
+    header {
+      background: #e3eafc;
+      color: #1e40af;
+      padding: 32px 0 28px 0;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(30, 64, 175, 0.13);
+      border-radius: 0 0 24px 24px;
+      position: relative;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 12px;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(17, 246, 154, 0.916);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .logo:hover {
+      transform: scale(1.08) rotate(-3deg);
+      box-shadow: 0 6px 24px rgba(117, 180, 184, 0.879);
+    }
+    
+    .logo {
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .brand-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1eaf6e;
+      letter-spacing: 1px;
+      animation: titleGlow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes titleGlow {
+      from { text-shadow: 0 0 5px rgba(30, 175, 110, 0.3); }
+      to { text-shadow: 0 0 20px rgba(30, 175, 110, 0.6), 0 0 30px rgba(30, 175, 110, 0.4); }
+    }
+    .brand-subtitle {
+      font-size: 1rem;
+      color: #4a6572;
+      font-weight: 500;
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .brand-logo-canteen {
+      color: #ff9800;
+      font-weight: 900;
+    }
+    header::after {
+      content: "";
+      display: block;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, #ffd166 0%, #fcb900 100%);
+      border-radius: 2px;
+      margin: 28px auto 0 auto;
+      opacity: 0.7;
+    }
+
+    /* login box below header */
+    .login-box {
+      padding: 22px 36px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(53, 66, 74, 0.12);
+      text-align: center;
+      width: fit-content;
+      z-index: 10;
+      position: relative;
+    }
+    .login-box span {
+      display: block;
+      font-size: 1.1rem;
+      color: #35424a;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .button {
+      background: linear-gradient(135deg, #fffbe6 0%, #fff3cd 100%);
+      color: #35424a;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 6px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .button:hover {
+      background: linear-gradient(135deg, #fff3cd 0%, #fffbe6 100%);
+      color: #35424a;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 209, 102, 0.4);
+      animation: buttonPulse 0.6s ease-in-out;
+    }
+    
+    @keyframes buttonPulse {
+      0% { transform: translateY(-2px) scale(1.05); }
+      50% { transform: translateY(-2px) scale(1.1); }
+      100% { transform: translateY(-2px) scale(1.05); }
+    }
+
+    /* food section same */
+    .food-types {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(53, 66, 74, 0.07);
+      width: 100%;
+      padding: 28px 32px;
+      text-align: center;
+      box-sizing: border-box;
+      margin-top: 28px;
+    }
+    .food-types h2 {
+      color: #35424a;
+      margin-bottom: 18px;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+    }
+    .food-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .food-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 32px;
+      width: 100%;
+    }
+    .food-list-grid li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f7fafc;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(53, 66, 74, 0.12);
+      padding: 32px 0 24px 0;
+      transition: transform 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .food-list-grid li:hover {
+      transform: translateY(-12px) scale(1.1) rotate(2deg);
+      box-shadow: 0 20px 60px rgba(255, 209, 102, 0.4);
+      background: linear-gradient(135deg, #fffbe6 0%, #fff3cd 100%);
+      border: 2px solid #ffd166;
+      animation: foodItemBounce 0.6s ease-in-out;
+    }
+    
+    @keyframes foodItemBounce {
+      0% { transform: translateY(-12px) scale(1.1) rotate(2deg); }
+      50% { transform: translateY(-18px) scale(1.15) rotate(-1deg); }
+      100% { transform: translateY(-12px) scale(1.1) rotate(2deg); }
+    }
+    .food-list-grid li {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .food-icon {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(53, 66, 74, 0.08);
+      background: #fff;
+      animation: iconFloat 4s ease-in-out infinite;
+    }
+    
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-5px) rotate(1deg); }
+      50% { transform: translateY(0px) rotate(0deg); }
+      75% { transform: translateY(-3px) rotate(-1deg); }
+    }
+    .food-list-grid span {
+      font-size: 1.4rem;
+      color: #35424a;
+      font-weight: 600;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px #e0e7ef;
+    }
+
+    footer {
+      text-align: center;
+      padding: 22px 0;
+      background: linear-gradient(90deg, #35424a 60%, #4a6572 100%);
+      color: #ffffff;
+      width: 100%;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      box-shadow: 0 -2px 8px rgba(53, 66, 74, 0.05);
+    }
+    
+    /* Login Container with Side Animations */
+    .login-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 28px auto;
+      max-width: 800px;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .side-animation {
+      width: 200px;
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+      max-width: 200px;
+    }
+    
+    .left-side {
+      margin-right: 40px;
+    }
+    
+    .right-side {
+      margin-left: 40px;
+    }
+    
+    /* Colorful Plates with Food */
+    .food-plate {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3), inset 0 3px 8px rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      transform-style: preserve-3d;
+    }
+    
+    .plate-red { background: radial-gradient(circle, #ffcccb 30%, #ff6b6b 70%); border-color: #ff4757; }
+    .plate-blue { background: radial-gradient(circle, #cce7ff 30%, #74b9ff 70%); border-color: #0984e3; }
+    .plate-green { background: radial-gradient(circle, #d4edda 30%, #55a3ff 70%); border-color: #00b894; }
+    .plate-yellow { background: radial-gradient(circle, #fff3cd 30%, #ffd166 70%); border-color: #fdcb6e; }
+    .plate-purple { background: radial-gradient(circle, #e2d5f1 30%, #a29bfe 70%); border-color: #6c5ce7; }
+    .plate-orange { background: radial-gradient(circle, #ffe4cc 30%, #ff9800 70%); border-color: #f57c00; }
+    
+    /* Page Load Animations */
+    header {
+      animation: slideDown 1s ease-out;
+    }
+    
+    .login-box {
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+    
+    .food-types {
+      animation: fadeInUp 1s ease-out 0.6s both;
+    }
+    
+    .food-list-grid li {
+      animation: popIn 0.6s ease-out both;
+    }
+    
+    .food-list-grid li:nth-child(1) { animation-delay: 0.8s; }
+    .food-list-grid li:nth-child(2) { animation-delay: 1s; }
+    .food-list-grid li:nth-child(3) { animation-delay: 1.2s; }
+    .food-list-grid li:nth-child(4) { animation-delay: 1.4s; }
+    .food-list-grid li:nth-child(5) { animation-delay: 1.6s; }
+    .food-list-grid li:nth-child(6) { animation-delay: 1.8s; }
+    
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeInUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes popIn {
+      0% { transform: scale(0) rotate(180deg); opacity: 0; }
+      80% { transform: scale(1.1) rotate(-10deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  
+  <header>
+    <div class="brand-logo">
+      <img src="mitslogo.png" alt="MITS Logo" class="logo">
+      <div class="brand-text">
+        <span class="brand-title">
+          MITS <span class="brand-logo-canteen">Canteen</span>
+        </span>
+        <span class="brand-subtitle">Fresh • Tasty • Affordable</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- login box with side animations -->
+  <div class="login-container">
+    <!-- Left Side Animation -->
+    <div class="side-animation left-side" id="leftSide"></div>
+    
+    <!-- Login Box -->
+    <div class="login-box">
+      <span>Login as:</span>
+      <a href="canteen-login.html" class="button">Canteen</a>
+      <a href="user-login.html" class="button">User</a>
+
+    </div>
+    
+    <!-- Right Side Animation -->
+    <div class="side-animation right-side" id="rightSide"></div>
+  </div>
+
+  <main>
+    <section class="food-types">
+      <h2>Types of Food Items</h2>
+      <ul class="food-list food-list-grid">
+        <li data-item="snacks">
+          <a href="snacks.html" style="text-decoration:none; color:inherit; display:block;">
+            <img src="images/index/snacks.png" alt="Snacks" class="food-icon">
+            <span>Snacks</span>
+          </a>
+        </li>
+        <li data-item="veg">
+          <a href="veg.html" style="text-decoration:none; color:inherit; display:block;">
+            <img src="images/index/veg.jpg" alt="Veg" class="food-icon">
+            <span>Veg</span>
+          </a>
+        </li>
+        <li data-item="icecream">
+          <a href="icecream.html" style="text-decoration:none; color:inherit; display:block;">
+            <img src="images/index/ice.webp" alt="Ice Creams" class="food-icon">
+            <span>Ice Creams</span>
+          </a>
+        </li>
+        <li data-item="juice">
+          <a href="juice.html" style="text-decoration:none; color:inherit; display:block;">
+            <img src="images/index/juice.jpg" alt="Juice" class="food-icon">
+            <span>Juice</span>
+          </a>
+        </li>
+        <li data-item="nonveg">
+          <a href="nonveg.html" style="text-decoration:none; color:inherit; display:block;">
+            <img src="images/index/nonveg.jpg" alt="Non Veg" class="food-icon">
+            <span>Non Veg</span>
+          </a>
+        </li>
+        <li data-item="starters">
+          <a href="starters.html" style="text-decoration:none; color:inherit; display:block;">
+            <img src="images/index/starters.jpeg" alt="Starters" class="food-icon">
+            <span>Starters</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 MITS Canteen. All rights reserved.</p>
+  </footer>
+  
+  <script src="js/api.js"></script>
+  <script>
+    // Load categories with item counts
+    async function loadCategoryData() {
+      try {
+        const categories = ['snacks', 'veg', 'icecream', 'juice', 'nonveg', 'starters'];
+        
+        for (const category of categories) {
+          const items = await API.getMenuItems(category);
+          const categoryElement = document.querySelector(`[data-item="${category}"]`);
+          if (categoryElement) {
+            const span = categoryElement.querySelector('span');
+            if (span) {
+              span.innerHTML = `${span.textContent} <small>(${items.length} items)</small>`;
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Could not load category data');
+      }
+    }
+    
+    // Check for logout message
+    function checkLogoutMessage() {
+      const logoutMessage = sessionStorage.getItem('logoutMessage');
+      if (logoutMessage) {
+        // Create and show logout notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #22c55e;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 1000;
+          font-weight: 600;
+        `;
+        notification.textContent = logoutMessage;
+        document.body.appendChild(notification);
+        
+        // Remove message and notification after 3 seconds
+        setTimeout(() => {
+          notification.remove();
+          sessionStorage.removeItem('logoutMessage');
+        }, 3000);
+      }
+    }
+    
+    // Side Plate Animation with GSAP
+    function startSidePlateAnimation() {
+      const leftSide = document.getElementById('leftSide');
+      const rightSide = document.getElementById('rightSide');
+      
+      const plateColors = ['plate-red', 'plate-blue', 'plate-green', 'plate-yellow', 'plate-purple', 'plate-orange'];
+      const leftFoodItems = ['🍛', '🍲', '🍦'];
+      const rightFoodItems = ['🍹', '🍗', '🍜'];
+      
+      function createSidePlate(container, foodItems, side) {
+        const plate = document.createElement('div');
+        const randomColor = plateColors[Math.floor(Math.random() * plateColors.length)];
+        const randomFood = foodItems[Math.floor(Math.random() * foodItems.length)];
+        
+        plate.className = `food-plate ${randomColor}`;
+        plate.textContent = randomFood;
+        plate.style.top = '-100px';
+        plate.style.left = side === 'left' ? '60px' : '60px';
+        
+        container.appendChild(plate);
+        
+        // GSAP animation
+        const tl = gsap.timeline();
+        
+        tl.to(plate, {
+          duration: 1.5,
+          y: 220,
+          rotation: 360,
+          ease: "power2.in"
+        })
+        .to(plate, {
+          duration: 0.5,
+          y: 200,
+          scale: 1.1,
+          ease: "bounce.out"
+        })
+        .to(plate, {
+          duration: 0.3,
+          scale: 1,
+          ease: "elastic.out(1, 0.3)"
+        })
+        .to(plate, {
+          duration: 2,
+          opacity: 0.8,
+          scale: 0.9
+        })
+        .to(plate, {
+          duration: 0.5,
+          opacity: 0,
+          scale: 0,
+          onComplete: () => plate.remove()
+        });
+      }
+      
+      function startLoop() {
+        // Left side plates
+        createSidePlate(leftSide, leftFoodItems, 'left');
+        
+        setTimeout(() => {
+          createSidePlate(rightSide, rightFoodItems, 'right');
+        }, 1000);
+        
+        setTimeout(() => {
+          createSidePlate(leftSide, leftFoodItems, 'left');
+        }, 2000);
+        
+        setTimeout(() => {
+          createSidePlate(rightSide, rightFoodItems, 'right');
+        }, 3000);
+        
+        // Loop every 6 seconds
+        setTimeout(startLoop, 6000);
+      }
+      
+      // Start after 1 second
+      setTimeout(startLoop, 1000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      loadCategoryData();
+      checkLogoutMessage();
+      startSidePlateAnimation();
+    });
+  </script>
+</body>
+</html>
