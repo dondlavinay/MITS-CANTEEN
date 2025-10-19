@@ -35,7 +35,7 @@ router.post('/send-otp', async (req, res) => {
       secure: true,
       connectionTimeout: 60000,
       greetingTimeout: 30000,
-      socketTimeout: 60000
+      socketTimeout: 60000,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
