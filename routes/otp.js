@@ -45,8 +45,9 @@ router.post('/send-otp', async (req, res) => {
       html: `<h2>Your OTP is: <strong>${otp}</strong></h2><p>Valid for 10 minutes.</p>`
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('OTP email sent to:', email);
+    const result = await transporter.sendMail(mailOptions);
+    console.log('SendGrid response:', result);
+    console.log('OTP email sent successfully to:', email);
     
     res.json({ success: true, message: 'OTP sent successfully' });
     
