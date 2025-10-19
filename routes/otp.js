@@ -28,18 +28,18 @@ router.post('/send-otp', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and OTP required' });
     }
 
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: process.env.SMTP_PORT || 587,
       secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.SMTP_USER || process.env.EMAIL_USER,
+        pass: process.env.SMTP_PASS || process.env.EMAIL_PASS
       }
     });
     
     const mailOptions = {
-      from: `"MITS Canteen" <${process.env.SMTP_USER}>`,
+      from: `"MITS Canteen" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: 'MITS Canteen - OTP Verification',
       html: `<h2>Your OTP is: <strong>${otp}</strong></h2><p>Valid for 10 minutes.</p>`
