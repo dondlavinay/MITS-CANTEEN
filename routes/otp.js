@@ -39,7 +39,7 @@ router.post('/send-otp', async (req, res) => {
     });
     
     const mailOptions = {
-      from: `"MITS Canteen" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+      from: `"MITS Canteen" <noreply@yourdomain.com>`,
       to: email,
       subject: 'MITS Canteen - OTP Verification',
       html: `<h2>Your OTP is: <strong>${otp}</strong></h2><p>Valid for 10 minutes.</p>`
