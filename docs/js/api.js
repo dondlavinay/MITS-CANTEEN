@@ -68,7 +68,7 @@ class API {
   }
 
   static async sendOTP(data) {
-    return this.request('/auth/send-otp', {
+    return this.request('/otp/send-otp', {
       method: 'POST',
       body: JSON.stringify(data)
     });

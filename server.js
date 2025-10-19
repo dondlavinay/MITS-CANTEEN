@@ -60,7 +60,9 @@ app.set('io', io);
 // Middleware
 app.use(cors({
   origin: ['https://dondlavinay.github.io', 'http://localhost:3000', 'http://localhost:3002', 'http://localhost:3005', 'http://localhost:5000'],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.static('docs'));
@@ -132,7 +134,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/menu', require('./routes/menu'));
-app.use('/api', require('./routes/otp'));
+app.use('/api/otp', require('./routes/otp'));
 // Extra protection: reject unauthenticated POST requests to orders early
 app.use('/api/orders', (req, res, next) => {
   // If this is a POST to create an order and there's no Authorization header,
