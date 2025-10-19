@@ -23,6 +23,7 @@ router.post('/send-otp', async (req, res) => {
   try {
     const { email, otp } = req.body;
     console.log('OTP Request received:', { email, otp });
+    console.log('Using SendGrid API key:', process.env.SENDGRID_API_KEY ? 'SET' : 'NOT SET');
     
     if (!email || !otp) {
       return res.status(400).json({ success: false, message: 'Email and OTP required' });
