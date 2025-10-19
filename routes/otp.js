@@ -52,8 +52,8 @@ router.post('/send-otp', async (req, res) => {
     res.json({ success: true, message: 'OTP sent successfully' });
     
   } catch (error) {
-    console.error('OTP send error:', error.message);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('SendGrid error details:', error);
+    res.status(500).json({ success: false, message: 'Failed to send OTP: ' + error.message });
   }
 });
 
