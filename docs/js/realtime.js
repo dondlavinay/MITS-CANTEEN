@@ -14,7 +14,8 @@ class RealTimeUpdates {
         }
         
         // Initialize Socket.IO connection with token for server-side auth
-        this.socket = io('http://localhost:3005', { auth: { token } });
+        const serverUrl = window.location.hostname === 'localhost' ? 'http://localhost:3005' : window.location.origin;
+        this.socket = io(serverUrl, { auth: { token } });
         
         this.socket.on('connect', () => {
             console.log('🔄 Connected to real-time updates');
