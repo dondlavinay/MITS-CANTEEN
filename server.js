@@ -48,8 +48,13 @@ io.use(async (socket, next) => {
     socket.user = user;
     next();
   } catch (err) {
-    console.error('Socket auth error:', err.message || err);
-    next(new Error('Authentication error'));
+    if (err.name === 'TokenExpiredError') {
+      console.log('Socket JWT expired, user needs to re-login');
+      next(new Error('Token expired'));
+    } else {
+      console.error('Socket auth error:', err.message || err);
+      next(new Error('Authentication error'));
+    }
   }
 });
 const PORT = process.env.PORT || 3002;
@@ -60,9 +65,7 @@ app.set('io', io);
 // Middleware
 app.use(cors({
   origin: ['https://dondlavinay.github.io', 'http://localhost:3000', 'http://localhost:3002', 'http://localhost:3005', 'http://localhost:5000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.static('docs'));
@@ -134,17 +137,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/menu', require('./routes/menu'));
-app.use('/api/otp', require('./routes/otp'));
-// Extra protection: reject unauthenticated POST requests to orders early
-app.use('/api/orders', (req, res, next) => {
-  // If this is a POST to create an order and there's no Authorization header,
-  // block it immediately before route handlers to ensure unauthenticated
-  // clients cannot bypass auth by other means.
-  if (req.method === 'POST' && !req.headers.authorization) {
-    return res.status(401).json({ message: 'Authentication required' });
-  }
-  next();
-}, require('./routes/orders'));
+app.use('/api/tracking', require('./routes/tracking'));
+app.use('/api/ratings', require('./routes/ratings'));
+app.use('/api/orders', require('./routes/orders'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -190,4 +185,6 @@ server.listen(PORT, () => {
   console.log(`🌐 Frontend: http://localhost:${PORT}`);
   console.log(`📡 API: http://localhost:${PORT}/api`);
   console.log(`🔄 Real-time updates enabled`);
+  console.log('📋 Registered routes:');
+  console.log('  - /api/orders (with rating endpoint)');
 });

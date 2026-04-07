@@ -170,7 +170,7 @@
             <button onclick="window.location.href='index.html'" class="button" style="background: #fff3cd; color: #35424a; padding: 6px 12px; font-size: 0.8rem;">🏠 Home</button>
         </div>
         <form class="customer-details-form">
-            <label for="customer-email">Email:</label>
+            <label for="customer-email">Email(college mail):</label>
             <input type="email" id="customer-email" name="customer-email" required>
             
             <div style="margin: 10px 0;">
@@ -196,19 +196,6 @@
                 <span onclick="togglePassword('password')" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: #666; user-select: none;">👁️</span>
             </div>
 
-            <div style="margin: 15px 0;">
-                <input type="checkbox" id="send-otp" style="margin-right: 8px;">
-                <label for="send-otp" style="display: inline; font-size: 0.9rem;">Send OTP to email for verification</label>
-                <div id="otp-message" style="display:none; color:#1e40af; margin-top:8px; font-size:1rem;">
-                    OTP sent to your email address.
-                </div>
-            </div>
-
-            <div id="otp-section" style="display: none; margin: 15px 0;">
-                <label for="otp-input">Enter OTP:</label>
-                <input type="text" id="otp-input" name="otp-input" maxlength="6" placeholder="6-digit OTP">
-            </div>
-
             <!-- Login Button -->
             <button type="submit" class="button">Log in</button>
         </form>
@@ -230,7 +217,7 @@
         <span id="user-info-phone" style="margin-left:12px;"></span>
     </div>
 
-    <script src="js/api.js"></script>
+    <script src="js/api.js?v=2"></script>
     <script>
         // Role selection logic
         const studentRadio = document.getElementById('student');
@@ -256,71 +243,6 @@
             }
         });
 
-        // OTP functionality
-        const otpCheckbox = document.getElementById('send-otp');
-        const otpSection = document.getElementById('otp-section');
-        let generatedOtp = '';
-
-        otpCheckbox.addEventListener('change', async function() {
-            const otpMessage = document.getElementById('otp-message');
-            
-            if (otpCheckbox.checked) {
-                const email = document.getElementById('customer-email').value;
-                
-                if (!email) {
-                    alert('Please enter email first');
-                    otpCheckbox.checked = false;
-                    return;
-                }
-                
-                try {
-                    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-                    
-                    const response = await fetch('/api/send-otp', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, otp: generatedOtp })
-                    });
-                    
-                    if (response.ok) {
-                        otpSection.style.display = 'block';
-                        otpMessage.style.display = 'block';
-                        showNotification(`📧 OTP sent to ${email}`);
-                    } else {
-                        throw new Error('Failed to send OTP');
-                    }
-                } catch (error) {
-                    otpSection.style.display = 'block';
-                    otpMessage.style.display = 'block';
-                    showNotification(`📧 OTP sent to ${email}: ${generatedOtp}`);
-                }
-            } else {
-                otpSection.style.display = 'none';
-                otpMessage.style.display = 'none';
-                generatedOtp = '';
-            }
-        });
-        
-        // Notification function
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<span>🍽️ ${message}</span>`;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
         // Toggle Password Visibility
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
@@ -341,18 +263,27 @@
             e.preventDefault();
             
             const email = document.getElementById('customer-email').value;
-            const role = document.querySelector('input[name="role"]:checked').value;
+            const roleElement = document.querySelector('input[name="role"]:checked');
+            
+            if (!roleElement) {
+                alert('Please select a role (Student or Staff)');
+                return;
+            }
+            
+            const role = roleElement.value;
             const studentId = document.getElementById('student-id').value;
             const staffId = document.getElementById('staff-id').value;
             const password = document.getElementById('password').value;
             
-            // Check OTP if enabled
-            if (otpCheckbox.checked) {
-                const enteredOtp = document.getElementById('otp-input').value;
-                if (enteredOtp !== generatedOtp) {
-                    alert('Invalid OTP!');
-                    return;
-                }
+            // Validate required fields based on role
+            if (role === 'Student' && !studentId) {
+                alert('Please enter Student ID');
+                return;
+            }
+            
+            if (role === 'Staff' && !staffId) {
+                alert('Please enter Staff ID');
+                return;
             }
             
             try {
@@ -374,8 +305,6 @@
                 if (window.realTimeUpdates) {
                     window.realTimeUpdates.connectAfterLogin();
                 }
-                
-                alert('Login successful!');
                 
                 // Check if user has items in cart and redirect to delivery details
                 const cart = JSON.parse(localStorage.getItem('cart') || '{}');

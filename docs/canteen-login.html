@@ -147,22 +147,8 @@
             <input type="text" id="canteen-name" name="canteen-name" required>
             
             <label for="canteen-password">Password:</label>
-            <div style="position: relative; display: inline-block; width: 100%;">
-                <input type="password" id="canteen-password" name="canteen-password" required style="width: 100%; padding-right: 30px; box-sizing: border-box;">
-                <span onclick="togglePassword('canteen-password')" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: #666; user-select: none;">👁️</span>
-            </div>
+            <input type="password" id="canteen-password" name="canteen-password" required>
             
-            <div style="margin: 10px 0;">
-                <input type="checkbox" id="send-otp" name="send-otp">
-                <label for="send-otp" style="display:inline;">Send OTP</label>
-                <div id="otp-message" style="display:none; color:#1e40af; margin-top:8px; font-size:1rem;">
-                    OTP sent to your mobile number and mail.
-                </div>
-            </div>
-
-            <label for="canteen-otp">OTP:</label>
-            <input type="text" id="canteen-otp" name="canteen-otp" required>
-
             <button type="submit" class="button">Log in</button>
         </form>
 
@@ -170,7 +156,7 @@
         </div>
     </div>
 
-    <script src="js/api.js"></script>
+    <script src="js/api.js?v=2"></script>
     <script>
         // Form Submit
         document.querySelector('.customer-details-form').addEventListener('submit', async function(e) {
@@ -178,85 +164,22 @@
             
             const canteenName = document.getElementById('canteen-name').value;
             const password = document.getElementById('canteen-password').value;
-            const otp = document.getElementById('canteen-otp').value;
-            
-            if (generatedOtp && otp !== generatedOtp) {
-                alert('Invalid OTP!');
-                return;
-            }
             
             try {
                 const response = await API.adminLogin({ canteenName, password });
                 API.setToken(response.token);
                 
-                // Preserve any updated profile data
                 const existingCanteen = JSON.parse(localStorage.getItem('canteen') || '{}');
                 const mergedCanteen = { ...response.user, ...existingCanteen };
                 
                 localStorage.setItem('canteenLoggedIn', 'true');
                 localStorage.setItem('canteen', JSON.stringify(mergedCanteen));
                 
-                alert('Login successful!');
                 window.location.href = 'canteen-dashboard.html';
             } catch (error) {
                 alert('Login failed: ' + error.message);
             }
         });
-
-        // Toggle Password Visibility
-        function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            const icon = field.nextElementSibling;
-            if (field.type === 'password') {
-                field.type = 'text';
-                icon.textContent = '🙈';
-            } else {
-                field.type = 'password';
-                icon.textContent = '👁️';
-            }
-        }
-
-        window.togglePassword = togglePassword;
-
-        // OTP
-        const sendOtpCheckbox = document.getElementById('send-otp');
-        const otpMessage = document.getElementById('otp-message');
-        let generatedOtp = '';
-
-        sendOtpCheckbox.addEventListener('change', async function() {
-            if (this.checked) {
-                const canteenName = document.getElementById('canteen-name').value;
-                if (!canteenName) {
-                    alert('Please enter canteen name first');
-                    this.checked = false;
-                    return;
-                }
-                
-                try {
-                    const response = await fetch('/api/admin/send-otp', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ canteenName })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        generatedOtp = data.otp;
-                        otpMessage.style.display = 'block';
-                        alert('OTP sent to your registered email!');
-                    } else {
-                        throw new Error('Failed to send OTP');
-                    }
-                } catch (error) {
-                    alert('Error sending OTP: ' + error.message);
-                    this.checked = false;
-                }
-            } else {
-                otpMessage.style.display = 'none';
-            }
-        });
-
-
     </script>
 </body>
 </html>

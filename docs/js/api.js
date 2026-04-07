@@ -11,7 +11,7 @@ try {
   // ignore
 }
 
-const API_BASE_URL = 'https://mits-canteen-backend1.onrender.com/api';
+const API_BASE_URL = '/api';
 
 class API {
   static getToken() {
@@ -40,12 +40,27 @@ class API {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
+        const text = await response.text();
+        if (text.includes('<!DOCTYPE')) {
+          throw new Error(`Server error: ${response.status} - Route not found`);
+        }
+        try {
+          const data = JSON.parse(text);
+          if (response.status === 401 && (data.message?.includes('expired') || data.message?.includes('invalid'))) {
+            this.removeToken();
+            localStorage.removeItem('user');
+            window.location.href = 'user-login.html';
+            throw new Error('Session expired. Please login again.');
+          }
+          throw new Error(data.message || 'Something went wrong');
+        } catch {
+          throw new Error(`Server error: ${response.status}`);
+        }
       }
       
+      const data = await response.json();
       return data;
     } catch (error) {
       throw error;
@@ -64,13 +79,6 @@ class API {
     return this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
-    });
-  }
-
-  static async sendOTP(data) {
-    return this.request('/otp/send-otp', {
-      method: 'POST',
-      body: JSON.stringify(data)
     });
   }
 
@@ -159,6 +167,17 @@ class API {
     return this.request(`/orders/${orderId}`, {
       method: 'DELETE'
     });
+  }
+
+  static async rateOrder(orderId, rating, review) {
+    return this.request(`/orders/${orderId}/rating`, {
+      method: 'PUT',
+      body: JSON.stringify({ rating, review })
+    });
+  }
+
+  static async healthCheck() {
+    return this.request('/health');
   }
 
   // Upload endpoint

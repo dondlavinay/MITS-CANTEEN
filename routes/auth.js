@@ -2,18 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-
 const router = express.Router();
-const otpStore = new Map();
-
-// Send OTP
-router.post('/send-otp', (req, res) => {
-  const { email, phone } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  otpStore.set(email || phone, { otp, expires: Date.now() + 300000 });
-  res.json({ message: 'OTP sent successfully', otp }); // Remove otp in production
-});
-
 // Register
 router.post('/register', async (req, res) => {
   try {

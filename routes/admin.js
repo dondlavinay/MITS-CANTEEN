@@ -2,61 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const auth = require('../middleware/auth');
-const nodemailer = require('nodemailer');
-
 const router = express.Router();
-const otpStore = new Map();
-
-// Email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-// Send OTP for admin
-router.post('/send-otp', async (req, res) => {
-  try {
-    const { canteenName } = req.body;
-    const admin = await Admin.findOne({ name: canteenName });
-    
-    if (!admin) {
-      return res.status(404).json({ message: 'Canteen not found' });
-    }
-    
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore.set(admin.email, { otp, expires: Date.now() + 300000 });
-    
-    try {
-      // Try to send email
-      console.log('Attempting to send email to:', admin.email);
-      console.log('Using email user:', process.env.EMAIL_USER);
-      
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: admin.email,
-        subject: 'MITS Canteen Login OTP',
-        text: `Your OTP for canteen login is: ${otp}. Valid for 5 minutes.`
-      });
-      
-      console.log('Email sent successfully');
-      res.json({ message: 'OTP sent to registered email' });
-    } catch (emailError) {
-      console.error('Email error:', emailError.message);
-      // Fallback: return OTP in response
-      res.json({ message: 'Email failed. Your OTP is', otp });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to send OTP' });
-  }
-});
-
-// Admin Register
 router.post('/register', async (req, res) => {
   try {
     const { name, email, phone, address, canteenId, canteenPhoto, password } = req.body;

@@ -219,19 +219,6 @@
                 <span onclick="togglePassword('confirm-password')" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: #666; user-select: none;">👁️</span>
             </div>
 
-            <div style="margin: 15px 0;">
-                <input type="checkbox" id="send-otp" style="margin-right: 8px;" disabled>
-                <label for="send-otp" style="display: inline; font-size: 0.9rem; opacity: 0.5;">Send OTP to email for verification (Fill all details first)</label>
-                <div id="otp-message" style="display:none; color:#1e40af; margin-top:8px; font-size:1rem;">
-                    OTP sent to your email address.
-                </div>
-            </div>
-
-            <div id="otp-section" style="display: none; margin: 15px 0;">
-                <label for="otp-input">Enter OTP:</label>
-                <input type="text" id="otp-input" name="otp-input" maxlength="6" placeholder="6-digit OTP">
-            </div>
-
             <button type="submit" class="button">Sign Up</button>
         </form>
 
@@ -264,128 +251,6 @@
                 studentRollDiv.style.display = 'none';
             }
         });
-
-        // Form validation for OTP checkbox
-        function validateForm() {
-            const name = document.getElementById('customer-name').value.trim();
-            const email = document.getElementById('customer-email').value.trim();
-            const phone = document.getElementById('customer-phone').value.trim();
-            const role = document.querySelector('input[name="role"]:checked');
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            
-            const isValid = name && email && phone && role && password && confirmPassword;
-            
-            const otpCheckbox = document.getElementById('send-otp');
-            const otpLabel = document.querySelector('label[for="send-otp"]');
-            
-            if (isValid) {
-                otpCheckbox.disabled = false;
-                otpLabel.style.opacity = '1';
-                otpLabel.textContent = 'Send OTP to email for verification';
-            } else {
-                otpCheckbox.disabled = true;
-                otpCheckbox.checked = false;
-                otpSection.style.display = 'none';
-                otpLabel.style.opacity = '0.5';
-                otpLabel.textContent = 'Send OTP to email for verification (Fill all details first)';
-            }
-        }
-        
-        // Add event listeners to all form fields
-        ['customer-name', 'customer-email', 'customer-phone', 'password', 'confirm-password'].forEach(id => {
-            document.getElementById(id).addEventListener('input', validateForm);
-        });
-        
-        document.querySelectorAll('input[name="role"]').forEach(radio => {
-            radio.addEventListener('change', validateForm);
-        });
-
-        // OTP Checkbox
-        const otpCheckbox = document.getElementById('send-otp');
-        const otpSection = document.getElementById('otp-section');
-        let otpSent = false;
-        let generatedOtp = '';
-
-        otpCheckbox.addEventListener('change', async function() {
-            const otpMessage = document.getElementById('otp-message');
-            
-            if (otpCheckbox.checked) {
-                const email = document.getElementById('customer-email').value;
-                
-                try {
-                    // Generate OTP
-                    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-                    
-                    console.log('Sending OTP request:', { email, otp: generatedOtp });
-                    
-                    // Send OTP to email
-                    const response = await fetch('/api/send-otp', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, otp: generatedOtp })
-                    });
-                    
-                    const data = await response.json();
-                    console.log('OTP API response:', { status: response.status, data });
-                    
-                    if (response.ok) {
-                        otpSection.style.display = 'block';
-                        otpMessage.style.display = 'block';
-                        otpSent = true;
-                        showNotification(`📧 OTP sent to ${email}`);
-                        console.log('OTP sent successfully');
-                    } else {
-                        // If email fails, use the OTP from response for demo
-                        if (data.otp) {
-                            generatedOtp = data.otp;
-                        }
-                        otpSection.style.display = 'block';
-                        otpMessage.style.display = 'block';
-                        otpSent = true;
-                        showNotification(`📧 Check your email for OTP`);
-                    }
-                } catch (error) {
-                    otpSection.style.display = 'block';
-                    otpMessage.style.display = 'block';
-                    otpSent = true;
-                    showNotification(`📧 Check your email for OTP`);
-                }
-            } else {
-                otpSection.style.display = 'none';
-                otpMessage.style.display = 'none';
-                otpSent = false;
-                generatedOtp = '';
-                showNotification('📧 OTP verification disabled');
-            }
-        });
-        
-        // Notification function
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `
-                <div class="notification-content">
-                    <span class="notification-icon">🍽️</span>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-
 
         // Toggle Password Visibility
         function togglePassword(fieldId) {
@@ -420,19 +285,6 @@
                 return;
             }
 
-            // Check OTP if enabled
-            if (otpCheckbox.checked) {
-                if (!otpSent) {
-                    alert('Please send OTP first!');
-                    return;
-                }
-                const enteredOtp = document.getElementById('otp-input').value;
-                if (enteredOtp !== generatedOtp) {
-                    alert('Invalid OTP!');
-                    return;
-                }
-            }
-
             try {
                 const userData = {
                     name,
@@ -450,7 +302,6 @@
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('user', JSON.stringify(response.user));
                 
-                alert('Registration successful!');
                 window.location.href = 'user-dashboard.html';
             } catch (error) {
                 alert('Registration failed: ' + error.message);
